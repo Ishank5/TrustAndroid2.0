@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "324751396105",
+    "project_id": "trust-android-104c0",
+    "storage_bucket": "trust-android-104c0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324751396105:android:e9d840b29f7c89ba8c97d8",
+        "android_client_info": {
+          "package_name": "com.example.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzQBpau4ZN_dbj32WMy5Haf6pvB6YK5Vc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:324751396105:android:8782881e38226c948c97d8",
+        "android_client_info": {
+          "package_name": "com.example.trustandroid20"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzQBpau4ZN_dbj32WMy5Haf6pvB6YK5Vc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
