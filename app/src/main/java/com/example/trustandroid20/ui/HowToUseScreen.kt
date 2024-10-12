@@ -23,7 +23,7 @@ fun HowToUseScreen() {
         verticalArrangement = Arrangement.Center, // Center vertically
         horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
     ) {
-        // Spacer(modifier = Modifier.height(150.dp)) // Optional spacer to push the WebView down
+
 
         AndroidView(
             factory = {
