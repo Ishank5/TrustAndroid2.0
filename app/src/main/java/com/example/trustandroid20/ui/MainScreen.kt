@@ -226,12 +226,12 @@ fun DeveloperDetailsScreen() {
 fun HowToUseScreen() {
     Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp), // Optional: Add some padding if needed
+            .fillMaxSize(),
+            //.padding(16.dp) // Optional: Add some padding if needed
         verticalArrangement = Arrangement.Center, // Center vertically
         horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
     ) {
-        Spacer(modifier = Modifier.height(150.dp)) // Optional spacer to push the WebView down
+       // Spacer(modifier = Modifier.height(150.dp)) // Optional spacer to push the WebView down
 
         AndroidView(
             factory = {
@@ -280,8 +280,9 @@ fun HowToUseScreen() {
                 }
             },
             modifier = Modifier
-                .fillMaxWidth(0.9f) // Make the WebView take up 90% of the width
-                .fillMaxHeight(0.9f) // Make the WebView take up 90% of the height
+                .fillMaxWidth(0.8f) // Make the WebView take up 90% of the width
+                .fillMaxHeight(0.8f) // Make the WebView take up 90% of the height
+
         )
     }
 }
