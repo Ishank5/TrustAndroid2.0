@@ -40,6 +40,7 @@ fun HowToUseScreen() {
             fontSize = 24.sp,
             color = Color.White
         )
+        Spacer(modifier = Modifier.height(4.dp))
         AndroidView(
             factory = {
                 WebView(it).apply {
