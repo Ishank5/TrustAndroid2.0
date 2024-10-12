@@ -1,29 +1,23 @@
 package com.example.trustandroid20
 
-
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
 import android.text.format.DateFormat
 import android.util.Log
-
 import android.widget.Toast
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
-
 import kotlinx.coroutines.Dispatchers
-
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream

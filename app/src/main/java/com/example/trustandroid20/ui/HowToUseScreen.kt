@@ -6,10 +6,15 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 
 
@@ -18,13 +23,23 @@ import androidx.compose.ui.viewinterop.AndroidView
 fun HowToUseScreen() {
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize().background(Color(0xFF1C2833)),
         //.padding(16.dp) // Optional: Add some padding if needed
         verticalArrangement = Arrangement.Center, // Center vertically
         horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
+
     ) {
-
-
+        Text(
+            text = "Learn To Use Trust Android App",
+            fontSize = 24.sp,
+            color = Color.White
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "(Play the given video)",
+            fontSize = 24.sp,
+            color = Color.White
+        )
         AndroidView(
             factory = {
                 WebView(it).apply {
