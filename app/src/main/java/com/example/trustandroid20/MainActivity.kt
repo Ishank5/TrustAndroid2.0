@@ -11,6 +11,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.trustandroid20.ui.BannedAppsList
+import com.example.trustandroid20.ui.HomeScreen
+import com.example.trustandroid20.ui.ShowAllBannedAppsScreen
 import com.example.trustandroid20.ui.theme.TrustAndroid20Theme
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.launch
