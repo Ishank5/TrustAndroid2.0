@@ -249,20 +249,9 @@ fun HowToUseScreen() {
                         Log.e("WebView", "Error loading page: ${error?.description}")
                     }
                 }
-                loadData(
-                    """
-                    <html>
-                    <body>
-                    <iframe width="100%" height="100%" src="https://youtu.be/OAnfbJ2ij8I?si=tQLumr8y-rwClbkW" frameborder="0" allowfullscreen></iframe>
-                    </body>
-                    </html>
-                    """.trimIndent(),
-                    "text/html",
-                    "utf-8"
-                )
+                loadUrl("https://youtu.be/OAnfbJ2ij8I?si=tQLumr8y-rwClbkW")
             }
         },
         modifier = Modifier.fillMaxSize()
-        //ansh
     )
 }
