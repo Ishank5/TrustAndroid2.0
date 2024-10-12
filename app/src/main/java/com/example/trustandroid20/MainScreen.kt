@@ -288,6 +288,7 @@ fun HowToUseScreen() {
             modifier = Modifier
                 .fillMaxWidth(1f) // Make the WebView take up 90% of the width
                 .fillMaxHeight(1f) // Make the WebView take up 90% of the height
+
         )
     }
 }
