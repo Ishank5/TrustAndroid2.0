@@ -81,11 +81,6 @@ dependencies {
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
     implementation(libs.androidx.core.ktx)
-    implementation ("com.google.api-client:google-api-client-android:1.33.0")
-    implementation ("com.google.api-client:google-api-client-gson:1.33.0")
-    implementation ("com.google.oauth-client:google-oauth-client-jetty:1.33.0")
-    // https://mvnrepository.com/artifact/com.google.apis/google-api-services-sheets
-    implementation("com.google.apis:google-api-services-sheets:v4-rev612-1.25.0")
 
     // Kotlin Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")

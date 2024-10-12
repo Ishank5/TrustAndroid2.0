@@ -1,19 +1,19 @@
 package com.example.trustandroid20
 
-import android.annotation.SuppressLint
+
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
+
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Environment
 import android.provider.Settings
 import android.text.format.DateFormat
 import android.util.Log
-import android.webkit.WebView
+
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -40,9 +40,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
+
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
+
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -57,13 +57,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
+
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.CoroutineScope
+
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -95,7 +95,7 @@ fun loadImageSync(context: Context, url: String): Bitmap? {
     } catch (e: Exception) {
         Log.e("ImageLoad", "Error loading image", e)
         null
-    } as Bitmap?
+    }
 }
 
 
@@ -583,24 +583,6 @@ fun uploadBannedAppsToFirestore(context: Context, userName: String, bannedApps: 
         bannedAppsCollection.document(appPackage).set(appData)
     }
 
-    // Initialize GoogleSheetsHelper with your Web App URL
-    val webAppUrl = "https://script.google.com/macros/s/AKfycbzEtRG0qIIjGbemCt35pQe5csSfloS2ELTmQbXM1dJbBL06SxSqNEbcJj5EzCk_sBhoSA/exec" // Replace with your actual Web App URL
-    val googleSheetsHelper = GoogleSheetsHelper(webAppUrl)
 
-    // Launch a coroutine to send data to Google Sheets
-    CoroutineScope(Dispatchers.Main).launch {
-        bannedApps.forEach { app ->
-            val appName = app.applicationInfo.loadLabel(context.packageManager).toString()
-            val appVersion = app.versionName
-            val appPackage = app.packageName
-            val appInstallDate = DateFormat.format("yyyy-MM-dd", app.firstInstallTime).toString()
-            val success = googleSheetsHelper.sendDataToSheet(userName, appName, appPackage, appVersion, appInstallDate)
-            if (success) {
-                Log.d("UploadToSheets", "Successfully uploaded $appName to Google Sheets")
-            } else {
-                Log.e("UploadToSheets", "Failed to upload $appName to Google Sheets")
-            }
-        }
-    }
 }
 

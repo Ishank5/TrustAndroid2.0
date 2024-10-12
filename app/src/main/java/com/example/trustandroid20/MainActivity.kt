@@ -1,22 +1,16 @@
 package com.example.trustandroid20
 
 import android.content.pm.PackageInfo
-
 import android.os.Bundle
-
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-
 import androidx.compose.runtime.*
-
 import androidx.compose.ui.platform.LocalContext
-
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-
 import com.example.trustandroid20.ui.theme.TrustAndroid20Theme
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.launch
@@ -25,8 +19,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//hello baby
-        // i hate my ex
+
         enableEdgeToEdge()
 
         try {
@@ -110,6 +103,3 @@ fun TrustAndroid() {
         }
     }
 }
-///from ansh and ishank
-// ansh
-//baby
