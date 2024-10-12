@@ -221,31 +221,41 @@ fun DeveloperDetailsScreen() {
 
 @Composable
 fun HowToUseScreen() {
-    AndroidView(
-        factory = {
-            WebView(it).apply {
-                settings.javaScriptEnabled = true
-                settings.domStorageEnabled = true
-                settings.loadWithOverviewMode = true
-                settings.useWideViewPort = true
-                webViewClient = object : WebViewClient() {
-                    override fun onPageFinished(view: WebView?, url: String?) {
-                        super.onPageFinished(view, url)
-                        Log.d("WebView", "Page loaded: $url")
-                    }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp), // Optional: Add some padding if needed
+        verticalArrangement = Arrangement.Center, // Center vertically
+        horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
+    ) {
+        AndroidView(
+            factory = {
+                WebView(it).apply {
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    settings.loadWithOverviewMode = true
+                    settings.useWideViewPort = true
+                    webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            super.onPageFinished(view, url)
+                            Log.d("WebView", "Page loaded: $url")
+                        }
 
-                    override fun onReceivedError(
-                        view: WebView?,
-                        request: WebResourceRequest?,
-                        error: WebResourceError?
-                    ) {
-                        super.onReceivedError(view, request, error)
-                        Log.e("WebView", "Error loading page: ${error?.description}")
+                        override fun onReceivedError(
+                            view: WebView?,
+                            request: WebResourceRequest?,
+                            error: WebResourceError?
+                        ) {
+                            super.onReceivedError(view, request, error)
+                            Log.e("WebView", "Error loading page: ${error?.description}")
+                        }
                     }
+                    loadUrl("file:///android_asset/how_to_use_video.html")
                 }
-                loadUrl("https://youtu.be/OAnfbJ2ij8I?si=tQLumr8y-rwClbkW")
-            }
-        },
-        modifier = Modifier.fillMaxSize()
-    )
+            },
+            modifier = Modifier
+                .fillMaxWidth(0.9f) // Make the WebView take up 90% of the width
+                .fillMaxHeight(0.9f) // Make the WebView take up 90% of the height
+        )
+    }
 }
