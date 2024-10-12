@@ -1,9 +1,12 @@
 package com.example.trustandroid20
 
 
+import android.app.Activity
 import android.content.pm.PackageInfo
 
 import android.util.Log
+import android.view.View
+import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -234,6 +237,8 @@ fun HowToUseScreen() {
         verticalArrangement = Arrangement.Center, // Center vertically
         horizontalAlignment = Alignment.CenterHorizontally // Center horizontally
     ) {
+        Spacer(modifier = Modifier.height(150.dp)) // Optional spacer to push the WebView down
+
         AndroidView(
             factory = {
                 WebView(it).apply {
@@ -241,6 +246,27 @@ fun HowToUseScreen() {
                     settings.domStorageEnabled = true
                     settings.loadWithOverviewMode = true
                     settings.useWideViewPort = true
+
+                    // Set a WebChromeClient to enable full-screen support
+                    webChromeClient = object : WebChromeClient() {
+                        private var customView: View? = null
+                        private var customViewCallback: WebChromeClient.CustomViewCallback? = null
+
+                        override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
+                            customView = view
+                            customViewCallback = callback
+                            (context as? Activity)?.setContentView(view) // Set full-screen view
+                        }
+
+                        override fun onHideCustomView() {
+                            customView?.let {
+                                //(context as? Activity)?.setContentView(R.layout.) // Replace with your main layout
+                                customView = null
+                                customViewCallback?.onCustomViewHidden() // Notify that the custom view has been hidden
+                            }
+                        }
+                    }
+
                     webViewClient = object : WebViewClient() {
                         override fun onPageFinished(view: WebView?, url: String?) {
                             super.onPageFinished(view, url)
@@ -265,3 +291,4 @@ fun HowToUseScreen() {
         )
     }
 }
+
