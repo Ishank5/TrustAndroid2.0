@@ -43,6 +43,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //hello baby
+        // i hate my ex
         enableEdgeToEdge()
 
         try {
