@@ -231,6 +231,9 @@ fun HowToUseScreen() {
         factory = {
             WebView(it).apply {
                 settings.javaScriptEnabled = true
+                settings.domStorageEnabled = true
+                settings.loadWithOverviewMode = true
+                settings.useWideViewPort = true
                 webViewClient = object : WebViewClient() {
                     override fun onPageFinished(view: WebView?, url: String?) {
                         super.onPageFinished(view, url)
@@ -260,5 +263,6 @@ fun HowToUseScreen() {
             }
         },
         modifier = Modifier.fillMaxSize()
+        //ansh
     )
 }
