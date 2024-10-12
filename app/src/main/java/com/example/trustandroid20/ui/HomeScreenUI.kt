@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.trustandroid20.FeatureBox
+
 import com.example.trustandroid20.R
 import com.example.trustandroid20.handleFeature2
 import com.example.trustandroid20.handleFeature3
