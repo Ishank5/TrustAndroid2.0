@@ -29,9 +29,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.trustandroid20.ui.BannedAppsList
 import com.example.trustandroid20.ui.DeveloperDetailsScreen
 import com.example.trustandroid20.ui.HomeScreen
@@ -69,14 +71,18 @@ fun TrustAndroid() {
     var allBannedApps by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     NavHost(navController = navController, startDestination = "loginScreen") {
         composable("loginScreen") {
-            LoginScreen(authViewModel = AuthViewModel()) {
-                navController.navigate("firstScreen")
+            LoginScreen(authViewModel = AuthViewModel()) { email ->
+                navController.navigate("firstScreen/$email")
             }
         }
-        composable("firstScreen") {
+        composable(
+            route = "firstScreen/{email}",
+            arguments = listOf(navArgument("email") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
             HomeScreenUI({ feature ->
                 when (feature) {
-                    "Scanning" -> navController.navigate("secondScreen")
+                    "Scanning" -> navController.navigate("secondScreen/$email")
                     "Feature3" -> navController.navigate("feature3Screen")
                     "Feature 4" -> {
                         fetchAllBannedAppsFromFirestore {
@@ -92,7 +98,11 @@ fun TrustAndroid() {
                 navController.navigate("howToUseScreen")
             })
         }
-        composable("secondScreen") {
+        composable(
+            route = "secondScreen/{email}",
+            arguments = listOf(navArgument("email") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val email = backStackEntry.arguments?.getString("email") ?: ""
             var showBannedApps by remember { mutableStateOf(false) }
             var bannedAppsList by remember { mutableStateOf<List<PackageInfo>>(emptyList()) }
             val coroutineScope = rememberCoroutineScope()
@@ -103,13 +113,12 @@ fun TrustAndroid() {
                     deleteApp(context, packageName)
                 }
             } else {
-                var userName by remember { mutableStateOf("") }
                 HomeScreen(
-                    userName = userName,
-                    onUserNameChange = { userName = it },
+                    userName = email,
+                    onUserNameChange = { /* No-op, as email should not change */ },
                     onScanButtonClick = {
                         coroutineScope.launch {
-                            checkForBannedApps(context, userName) {
+                            checkForBannedApps(context, email) {
                                 bannedAppsList = it
                                 showBannedApps = true
                             }
@@ -134,7 +143,7 @@ fun TrustAndroid() {
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel,
-    onSignInSuccess: () -> Unit
+    onSignInSuccess: (String) -> Unit // Pass email on success
 ) {
     val result = authViewModel.authResult.observeAsState()
 
@@ -185,7 +194,7 @@ fun LoginScreen(
                 authViewModel.login(email, password)
                 when (result.value) {
                     is Result.Success<*> -> {
-                        onSignInSuccess()
+                        onSignInSuccess(email) // Pass email on success
                     }
                     is Result.Error -> {
                         Toast.makeText(context, "Incorrect credentials, please try again.", Toast.LENGTH_LONG).show()
