@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.trustandroid20.Globalvariable
 
 import com.example.trustandroid20.R
 import com.example.trustandroid20.handleFeature2
@@ -88,7 +89,7 @@ fun HomeScreenUI(onFeatureClick: (String) -> Unit, bannedApps: List<PackageInfo>
                 )
                 FeatureBox(
                     featureName = "Export Now", icon =downloadIcon,
-                    onClick = { handleFeature2(context, userName) },
+                    onClick = { handleFeature2(context, Globalvariable.username) },
                     modifier = Modifier.weight(1f).padding(8.dp)
                 )
             }
@@ -98,7 +99,7 @@ fun HomeScreenUI(onFeatureClick: (String) -> Unit, bannedApps: List<PackageInfo>
             ) {
                 FeatureBox(
                     featureName = "Share Now", icon = shareIcon,
-                    onClick = { handleFeature3(context, userName) },
+                    onClick = { handleFeature3(context, Globalvariable.username) },
                     modifier = Modifier.weight(1f).padding(8.dp)
                 )
                 FeatureBox(

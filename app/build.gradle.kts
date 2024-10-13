@@ -88,7 +88,7 @@ dependencies {
 
     // JSON Handling
     implementation ("org.json:json:20220320") // Or any preferred JSON library
-
+    implementation ("androidx.compose.runtime:runtime-livedata:1.3.0")
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))

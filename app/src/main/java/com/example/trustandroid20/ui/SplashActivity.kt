@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.Image
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -56,25 +59,54 @@ fun SplashScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Designed and Developed By",
-                fontSize = 24.sp,
+                text = "APP Scanner",
+                fontSize = 22.sp,
                 color = Color.White
             )
             Text(
-                text = "2 Corps Zone Work Shop, Patiala and ",
-                fontSize = 24.sp,
+                text = "Designed and Developed",
+                fontSize = 22.sp,
                 color = Color.White
             )
             Text(
-                text = "Thapar Institute of Engineering and",
-                fontSize = 24.sp,
+                text = "By",
+                fontSize = 22.sp,
                 color = Color.White
             )
             Text(
-                text = "Technology",
-                fontSize = 24.sp,
+                text = "2 Corps Zone Work Shop, Patiala",
+                fontSize = 22.sp,
                 color = Color.White
             )
+            Text(
+                text = " and ",
+                fontSize = 22.sp,
+                color = Color.White
+            )
+            Text(
+                text = "Thapar Institute of Engg. & Tech, Patiala",
+                fontSize = 22.sp,
+                color = Color.White
+            )
+            Row {
+                val image2: Painter = painterResource(id = R.mipmap.ic_launcher_foreground)
+                Image(
+                    painter = image2,
+                    contentDescription = "Example Image",
+                    modifier = Modifier
+                        .size(200.dp)
+                        .padding(16.dp)
+                )
+                val image: Painter = painterResource(id = R.mipmap.ic_tiet_foreground)
+                Image(
+                    painter = image,
+                    contentDescription = "Example Image",
+                    modifier = Modifier
+                        .size(200.dp)
+                        .padding(16.dp)
+                )
+
+            }
         }
     }
 }

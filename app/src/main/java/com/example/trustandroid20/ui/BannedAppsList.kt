@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +45,8 @@ fun BannedAppsList(bannedApps: List<PackageInfo>, onDeleteClick: (String) -> Uni
                 Text(text = "No banned apps found.", color = Color(0xFFFDFEFE)) // Light grey-white color
             }
         } else {
+
+
             LazyColumn {
                 items(bannedApps) { app ->
                     BannedAppItem(app) { packageName ->

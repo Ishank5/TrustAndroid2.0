@@ -191,6 +191,7 @@ fun LoginScreen(
         val context = LocalContext.current
         Button(
             onClick = {
+                Globalvariable.username=email
                 authViewModel.login(email, password)
                 when (result.value) {
                     is Result.Success<*> -> {

@@ -103,7 +103,7 @@ fun generateAndSharePdf(context: Context, userName: String, bannedApps: List<Pac
     paint.isFakeBoldText = true
     paint.textAlign = android.graphics.Paint.Align.CENTER
     canvas.drawText("Banned Apps Report", (pageInfo.pageWidth / 2).toFloat(), 40f, paint)
-
+    canvas.drawText("$userName", (pageInfo.pageWidth / 2).toFloat(), 40f, paint)
     // Content
     paint.textSize = 12f
     paint.isFakeBoldText = false
@@ -174,6 +174,7 @@ fun generatePdf(context: Context, userName: String, bannedApps: List<PackageInfo
     paint.isFakeBoldText = true
     paint.textAlign = android.graphics.Paint.Align.CENTER
     canvas.drawText("Banned Apps Report", (pageInfo.pageWidth / 2).toFloat(), 40f, paint)
+    canvas.drawText("$userName", (pageInfo.pageWidth / 2).toFloat(), 40f, paint)
 
     // Set up paint for content
     paint.textSize = 12f
