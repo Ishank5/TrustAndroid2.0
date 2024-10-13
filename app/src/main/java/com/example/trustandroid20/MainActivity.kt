@@ -3,11 +3,32 @@ package com.example.trustandroid20
 import android.content.pm.PackageInfo
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -46,10 +67,14 @@ fun TrustAndroid() {
     val navController = rememberNavController()
     val bannedAppsList by remember { mutableStateOf<List<PackageInfo>>(emptyList()) }
     var allBannedApps by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
-    NavHost(navController = navController, startDestination = "firstScreen") {
-
+    NavHost(navController = navController, startDestination = "loginScreen") {
+        composable("loginScreen") {
+            LoginScreen(authViewModel = AuthViewModel()) {
+                navController.navigate("firstScreen")
+            }
+        }
         composable("firstScreen") {
-            HomeScreenUI ({ feature ->
+            HomeScreenUI({ feature ->
                 when (feature) {
                     "Scanning" -> navController.navigate("secondScreen")
                     "Feature3" -> navController.navigate("feature3Screen")
@@ -67,7 +92,6 @@ fun TrustAndroid() {
                 navController.navigate("howToUseScreen")
             })
         }
-
         composable("secondScreen") {
             var showBannedApps by remember { mutableStateOf(false) }
             var bannedAppsList by remember { mutableStateOf<List<PackageInfo>>(emptyList()) }
@@ -94,17 +118,92 @@ fun TrustAndroid() {
                 )
             }
         }
-
         composable("showAllScreen") {
             ShowAllBannedAppsScreen(allBannedApps)
         }
-
         composable("contactDevelopersScreen") {
             DeveloperDetailsScreen()
         }
-
         composable("howToUseScreen") {
             HowToUseScreen()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LoginScreen(
+    authViewModel: AuthViewModel,
+    onSignInSuccess: () -> Unit
+) {
+    val result = authViewModel.authResult.observeAsState()
+
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Login",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+        TextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface
+            )
+        )
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            colors = TextFieldDefaults.textFieldColors(
+                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface
+            )
+        )
+        val context = LocalContext.current
+        Button(
+            onClick = {
+                authViewModel.login(email, password)
+                when (result.value) {
+                    is Result.Success<*> -> {
+                        onSignInSuccess()
+                    }
+                    is Result.Error -> {
+                        Toast.makeText(context, "Incorrect credentials, please try again.", Toast.LENGTH_LONG).show()
+                    }
+                    else -> { }
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(12.dp),
+        ) {
+            Text(
+                text = "Login",
+                fontSize = 16.sp,
+                color = Color.White
+            )
         }
     }
 }

@@ -113,4 +113,5 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.5.3")
     implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
     implementation("androidx.navigation:navigation-compose:2.8.2")
+    implementation ("androidx.compose.runtime:runtime-livedata:1.3.0")
 }
