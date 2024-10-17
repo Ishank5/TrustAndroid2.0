@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -28,11 +29,19 @@ fun HomeScreen(userName: String, onUserNameChange: (String) -> Unit, onScanButto
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .background(Color(0xFF2C3E50)), // Dark military green-blue background
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF2E3B55),  // Dark Blue-Grey
+                        Color(0xFF1C2833),  // Darker Blue-Grey
+                        Color(0xFF0B1A30)   // Very Dark Blue-Grey
+                    )
+                )
+            )
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+    ){
         Text(
             text = "Welcome to TrustAndroid",
             style = MaterialTheme.typography.headlineLarge.copy(

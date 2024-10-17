@@ -270,7 +270,6 @@ fun checkForBannedApps(context: Context, userName: String, onResult: (List<Packa
 //    return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 //}
 
-
 fun uploadBannedAppsToFirestore(context: Context, userName: String, bannedApps: List<PackageInfo>) {
     val firestore = FirebaseFirestore.getInstance()
     val deviceCollection = firestore.collection("devices").document(userName)
