@@ -46,11 +46,11 @@ class MyForegroundService : Service() {
         val handler = Handler(Looper.getMainLooper())
         val runnable = object : Runnable {
             override fun run() {
-                val userName = "user@example.com" // Replace with actual user name
+                var userName = Globalvariable.username // Replace with actual user name
                 checkForBannedApps(applicationContext, userName) {
                     // Handle the result if needed
                 }
-                handler.postDelayed(this, 60 * 60 * 1000) // Run every hour
+                handler.postDelayed(this, 1 * 10 * 1000) // Run every hour
             }
         }
         handler.post(runnable)
