@@ -1,6 +1,14 @@
 package com.example.trustandroid20
 
+import android.app.Activity
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageInfo
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -42,9 +50,16 @@ import com.example.trustandroid20.ui.ShowAllBannedAppsScreen
 import com.example.trustandroid20.ui.theme.TrustAndroid20Theme
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.launch
+import java.util.Calendar
+
 
 
 class MainActivity : ComponentActivity() {
+
+    companion object {
+        const val REQUEST_CODE_ENABLE_ADMIN = 1
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,13 +71,45 @@ class MainActivity : ComponentActivity() {
             Log.e("FirebaseError", "Failed to initialize Firebase", e)
         }
 
+        requestDeviceAdmin()
+
         setContent {
             TrustAndroid20Theme {
                 TrustAndroid()
+                // Schedule the alarm here
+
+            }
+        }
+    }
+
+    private fun requestDeviceAdmin() {
+        val deviceAdminComponent = ComponentName(this, MyDeviceAdminReceiver::class.java)
+        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+            putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponent)
+            putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Your explanation here")
+        }
+        startActivityForResult(intent, REQUEST_CODE_ENABLE_ADMIN)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_ENABLE_ADMIN) {
+            if (resultCode == Activity.RESULT_OK) {
+                Toast.makeText(this, "Device Admin Enabled", Toast.LENGTH_SHORT).show()
+                // Start the foreground service
+                val serviceIntent = Intent(this, MyForegroundService::class.java)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(serviceIntent)
+                } else {
+                    startService(serviceIntent)
+                }
+            } else {
+                Toast.makeText(this, "Device Admin Enabling Failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
 }
+
 
 @Composable
 fun TrustAndroid() {
