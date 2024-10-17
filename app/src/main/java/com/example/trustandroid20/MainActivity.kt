@@ -76,6 +76,10 @@ class MainActivity : ComponentActivity() {
         }
 
         requestLocationPermissions()
+        setContent()
+        {
+            TrustAndroid()
+        }
     }
 
     private fun requestLocationPermissions() {
