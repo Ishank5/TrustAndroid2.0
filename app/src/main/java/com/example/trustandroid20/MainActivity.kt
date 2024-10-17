@@ -1,5 +1,6 @@
 package com.example.trustandroid20
 
+
 import android.app.Activity
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -8,6 +9,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -37,6 +39,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -51,13 +55,13 @@ import com.example.trustandroid20.ui.theme.TrustAndroid20Theme
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.launch
 import java.util.Calendar
-
-
+import android.Manifest
 
 class MainActivity : ComponentActivity() {
 
     companion object {
         const val REQUEST_CODE_ENABLE_ADMIN = 1
+        const val LOCATION_PERMISSION_REQUEST_CODE = 1001
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,13 +75,29 @@ class MainActivity : ComponentActivity() {
             Log.e("FirebaseError", "Failed to initialize Firebase", e)
         }
 
-        requestDeviceAdmin()
+        requestLocationPermissions()
+    }
 
-        setContent {
-            TrustAndroid20Theme {
-                TrustAndroid()
-                // Schedule the alarm here
+    private fun requestLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            requestDeviceAdmin()
+        }
+    }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                requestDeviceAdmin()
+            } else {
+                Toast.makeText(this, "Location permissions are required for this app to function.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -109,8 +129,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-
 @Composable
 fun TrustAndroid() {
     val navController = rememberNavController()

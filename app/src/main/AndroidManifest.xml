@@ -11,8 +11,10 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -66,9 +68,7 @@
             android:foregroundServiceType="location"
             android:exported="false" />
 
-        <receiver
-            android:name=".AlarmReceiver"
-            android:exported="true"/>
+
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
@@ -78,9 +78,7 @@
             android:name="firebase_database_url"
             android:value="https://your-firebase-database-url.firebaseio.com"/>
 
-        <meta-data
-            android:name="google_api_key"
-            android:value="YOUR_API_KEY_HERE"/>
+
 
     </application>
 
