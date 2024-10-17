@@ -1,6 +1,13 @@
 package com.example.trustandroid20
 
+
+import android.app.Activity
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
+import android.content.Intent
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -29,6 +36,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,15 +48,24 @@ import com.example.trustandroid20.ui.DeveloperDetailsScreen
 import com.example.trustandroid20.ui.HomeScreen
 import com.example.trustandroid20.ui.HomeScreenUI
 import com.example.trustandroid20.ui.ShowAllBannedAppsScreen
-import com.example.trustandroid20.ui.theme.TrustAndroid20Theme
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.launch
-
+import android.Manifest
+import android.content.Context
+import android.content.SharedPreferences
+import com.example.trustandroid20.ui.theme.TrustAndroid20Theme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var sharedPreferences: SharedPreferences
+
+    companion object {
+        const val REQUEST_CODE_ENABLE_ADMIN = 1
+        const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
         enableEdgeToEdge()
 
         try {
@@ -56,9 +74,85 @@ class MainActivity : ComponentActivity() {
             Log.e("FirebaseError", "Failed to initialize Firebase", e)
         }
 
-        setContent {
-            TrustAndroid20Theme {
-                TrustAndroid()
+        // Check if the username is 'temp'
+        val username = sharedPreferences.getString("username", "")
+        if (username == "temp") {
+            // Navigate to the login screen
+            setContent {
+                TrustAndroid20Theme {
+                    LoginScreen(authViewModel = AuthViewModel(), sharedPreferences = sharedPreferences) { email ->
+                        sharedPreferences.edit().putString("username", email).apply()
+
+                    }
+                }
+            }
+        } else {
+            // Check if user is already logged in
+            if (sharedPreferences.getBoolean("is_logged_in", false)) {
+                // Navigate to the main screen directly
+                setContent {
+                    TrustAndroid20Theme {
+                        TrustAndroid()
+                    }
+                }
+            } else {
+                requestLocationPermissions()
+                setContent {
+                    TrustAndroid20Theme {
+                        TrustAndroid()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun requestLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
+            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+        } else {
+            requestDeviceAdmin()
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                requestDeviceAdmin()
+            } else {
+                Toast.makeText(this, "Location permissions are required for this app to function.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun requestDeviceAdmin() {
+        val deviceAdminComponent = ComponentName(this, MyDeviceAdminReceiver::class.java)
+        val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+            putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, deviceAdminComponent)
+            putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION, "Your explanation here")
+        }
+        startActivityForResult(intent, REQUEST_CODE_ENABLE_ADMIN)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_CODE_ENABLE_ADMIN) {
+            if (resultCode == Activity.RESULT_OK) {
+                Toast.makeText(this, "Device Admin Enabled", Toast.LENGTH_SHORT).show()
+                // Start the foreground service
+                val serviceIntent = Intent(this, MyForegroundService::class.java)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(serviceIntent)
+                } else {
+                    startService(serviceIntent)
+                }
+            } else {
+                Toast.makeText(this, "Device Admin Enabling Failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -69,9 +163,14 @@ fun TrustAndroid() {
     val navController = rememberNavController()
     val bannedAppsList by remember { mutableStateOf<List<PackageInfo>>(emptyList()) }
     var allBannedApps by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
-    NavHost(navController = navController, startDestination = "loginScreen") {
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false)
+    val startDestination = if (isLoggedIn) "firstScreen/${sharedPreferences.getString("email", "")}" else "loginScreen"
+
+    NavHost(navController = navController, startDestination = startDestination) {
         composable("loginScreen") {
-            LoginScreen(authViewModel = AuthViewModel()) { email ->
+            LoginScreen(authViewModel = AuthViewModel(), sharedPreferences = sharedPreferences) { email ->
                 navController.navigate("firstScreen/$email")
             }
         }
@@ -106,7 +205,6 @@ fun TrustAndroid() {
             var showBannedApps by remember { mutableStateOf(false) }
             var bannedAppsList by remember { mutableStateOf<List<PackageInfo>>(emptyList()) }
             val coroutineScope = rememberCoroutineScope()
-            val context = LocalContext.current
 
             if (showBannedApps) {
                 BannedAppsList(bannedAppsList) { packageName ->
@@ -143,6 +241,7 @@ fun TrustAndroid() {
 @Composable
 fun LoginScreen(
     authViewModel: AuthViewModel,
+    sharedPreferences: SharedPreferences,
     onSignInSuccess: (String) -> Unit // Pass email on success
 ) {
     val result = authViewModel.authResult.observeAsState()
@@ -195,6 +294,12 @@ fun LoginScreen(
                 authViewModel.login(email, password)
                 when (result.value) {
                     is Result.Success<*> -> {
+                        with(sharedPreferences.edit()) {
+                            putString("email", email)
+                            putString("password", password)
+                            putBoolean("is_logged_in", true)
+                            apply()
+                        }
                         onSignInSuccess(email) // Pass email on success
                     }
                     is Result.Error -> {
