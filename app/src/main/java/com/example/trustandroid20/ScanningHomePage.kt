@@ -16,7 +16,9 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -268,29 +270,61 @@ fun checkForBannedApps(context: Context, userName: String, onResult: (List<Packa
 //    return Settings.Secure.getString(context.contentResolver, Settings.Secure.ANDROID_ID)
 //}
 
+
 fun uploadBannedAppsToFirestore(context: Context, userName: String, bannedApps: List<PackageInfo>) {
     val firestore = FirebaseFirestore.getInstance()
-    //val deviceId = getDeviceId(context)
     val deviceCollection = firestore.collection("devices").document(userName)
-
-    //deviceCollection.set(mapOf("userName" to userName))
-
     val bannedAppsCollection = deviceCollection.collection("bannedApps")
-    bannedApps.forEach { app ->
-        val appName = app.applicationInfo.loadLabel(context.packageManager).toString()
-        val appVersion = app.versionName
-        val appPackage = app.packageName
-        val appInstallDate = DateFormat.format("yyyy-MM-dd", app.firstInstallTime).toString()
 
-        val appData = mapOf(
-            "appName" to appName,
-            "appVersion" to appVersion,
-            "appPackage" to appPackage,
-            "appInstallDate" to appInstallDate
-        )
-        bannedAppsCollection.document(appPackage).set(appData)
+    // Delete all existing documents in the bannedApps collection
+    deleteCollection(bannedAppsCollection) {
+        // After deleting, proceed to upload the new banned apps data
+        bannedApps.forEach { app ->
+            val appName = app.applicationInfo.loadLabel(context.packageManager).toString()
+            val appVersion = app.versionName
+            val appPackage = app.packageName
+            val appInstallDate = DateFormat.format("yyyy-MM-dd", app.firstInstallTime).toString()
+
+            val appData = mapOf(
+                "appName" to appName,
+                "appVersion" to appVersion,
+                "appPackage" to appPackage,
+                "appInstallDate" to appInstallDate
+            )
+            bannedAppsCollection.document(appPackage).set(appData)
+        }
     }
-
-
 }
 
+// Function to delete all documents in a collection
+fun deleteCollection(collection: CollectionReference, onComplete: () -> Unit) {
+    collection.get().addOnSuccessListener { snapshot ->
+        deleteDocuments(snapshot) {
+            onComplete()
+        }
+    }.addOnFailureListener { exception ->
+        // Handle any errors that occurred during the deletion
+        exception.printStackTrace()
+        onComplete()  // Call onComplete even if there was an error
+    }
+}
+
+// Recursive function to delete all documents in a snapshot
+fun deleteDocuments(snapshot: QuerySnapshot, onComplete: () -> Unit) {
+    val batch = FirebaseFirestore.getInstance().batch()
+    snapshot.documents.forEach { document ->
+        batch.delete(document.reference)
+    }
+    batch.commit().addOnSuccessListener {
+        if (snapshot.size() >= 500) {
+            // There might be more documents to delete, so fetch the next batch
+            deleteCollection(snapshot.documentChanges.last().document.reference.parent, onComplete)
+        } else {
+            onComplete()
+        }
+    }.addOnFailureListener { exception ->
+        // Handle any errors that occurred during the batch commit
+        exception.printStackTrace()
+        onComplete()  // Call onComplete even if there was an error
+    }
+}
