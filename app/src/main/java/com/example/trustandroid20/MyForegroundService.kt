@@ -6,11 +6,14 @@ import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
+
 
 class MyForegroundService : Service() {
 
@@ -46,11 +49,19 @@ class MyForegroundService : Service() {
         val handler = Handler(Looper.getMainLooper())
         val runnable = object : Runnable {
             override fun run() {
-                var userName = Globalvariable.username // Replace with actual user name
+                val sharedPreferences: SharedPreferences = getSharedPreferences(
+                    "user_prefs",
+                    Context.MODE_PRIVATE
+                )
+                var userName: String = sharedPreferences.getString("username", "temp") ?: "temp"
+                if (Globalvariable.username.isNotEmpty()) {
+                    userName = Globalvariable.username
+                }
+
                 checkForBannedApps(applicationContext, userName) {
                     // Handle the result if needed
                 }
-                handler.postDelayed(this, 15 * 60 * 1000) // Run every hour
+                handler.postDelayed(this, 1 * 10 * 1000) // Run every 10 seconds
             }
         }
         handler.post(runnable)
@@ -60,3 +71,4 @@ class MyForegroundService : Service() {
         return null
     }
 }
+

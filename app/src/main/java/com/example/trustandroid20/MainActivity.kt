@@ -15,6 +15,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 
+
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -66,12 +69,22 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         const val REQUEST_CODE_ENABLE_ADMIN = 1
-        const val LOCATION_PERMISSION_REQUEST_CODE = 1001
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE)
+
+        // Initialize EncryptedSharedPreferences
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        sharedPreferences = EncryptedSharedPreferences.create(
+            "user_prefs",
+            masterKeyAlias,
+            this,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
         enableEdgeToEdge()
 
         try {
@@ -82,13 +95,15 @@ class MainActivity : ComponentActivity() {
 
         // Check if the username is 'temp'
         val username = sharedPreferences.getString("username", "")
+
+        Globalvariable.username = username ?: ""////////////////////////////////////////////
+
         if (username == "temp") {
             // Navigate to the login screen
             setContent {
                 TrustAndroid20Theme {
                     LoginScreen(authViewModel = AuthViewModel(), sharedPreferences = sharedPreferences) { email ->
-                        sharedPreferences.edit().putString("username", email).apply()
-
+                        sharedPreferences.edit().putString("username", email).commit() // Use commit() for immediate save
                     }
                 }
             }
@@ -102,7 +117,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             } else {
-                requestLocationPermissions()
+                requestDeviceAdmin()
                 setContent {
                     TrustAndroid20Theme {
                         TrustAndroid()
@@ -112,29 +127,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun requestLocationPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                LOCATION_PERMISSION_REQUEST_CODE
-            )
-        } else {
-            requestDeviceAdmin()
-        }
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                requestDeviceAdmin()
-            } else {
-                Toast.makeText(this, "Location permissions are required for this app to function.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
 
     private fun requestDeviceAdmin() {
         val deviceAdminComponent = ComponentName(this, MyDeviceAdminReceiver::class.java)
