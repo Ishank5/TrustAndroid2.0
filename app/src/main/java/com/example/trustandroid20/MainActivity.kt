@@ -6,7 +6,7 @@ import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
+
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -39,8 +39,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -53,7 +52,6 @@ import com.example.trustandroid20.ui.HomeScreenUI
 import com.example.trustandroid20.ui.ShowAllBannedAppsScreen
 import com.google.firebase.FirebaseApp
 import kotlinx.coroutines.launch
-import android.Manifest
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.ConnectivityManager
@@ -301,6 +299,7 @@ fun LoginScreen(
         Button(
             onClick = {
                 if (isInternetAvailable(context)) {
+                    sharedPreferences.edit().putString("username", email).commit() // Immediate save
                     Globalvariable.username = email
                     authViewModel.login(email, password)
                 } else {

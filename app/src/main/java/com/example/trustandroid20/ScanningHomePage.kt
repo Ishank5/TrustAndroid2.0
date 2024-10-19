@@ -8,7 +8,6 @@ import android.graphics.Bitmap
 import android.graphics.pdf.PdfDocument
 import android.net.Uri
 import android.os.Environment
-import android.provider.Settings
 import android.text.format.DateFormat
 import android.util.Log
 import android.widget.Toast

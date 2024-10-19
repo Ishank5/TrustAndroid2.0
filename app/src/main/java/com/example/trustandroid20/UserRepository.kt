@@ -1,6 +1,6 @@
 package com.example.trustandroid20
 
-import android.util.Log
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await

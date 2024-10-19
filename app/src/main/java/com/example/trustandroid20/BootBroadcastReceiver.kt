@@ -4,8 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKeys
+
 
 class BootBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -18,10 +17,11 @@ class BootBroadcastReceiver : BroadcastReceiver() {
 
             // Retrieve username from SharedPreferences
             val username = sharedPreferences.getString("username", "temp")
-            Globalvariable.username = username ?: "temp"
+            Globalvariable.username = username.toString()
 
             // Start the service
             val serviceIntent = Intent(context, MyForegroundService::class.java)
+            serviceIntent.putExtra("username", Globalvariable.username)
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
                 context.startForegroundService(serviceIntent)
             } else {

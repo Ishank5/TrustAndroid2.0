@@ -115,4 +115,5 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.8.2")
     implementation ("androidx.compose.runtime:runtime-livedata:1.3.0")
     implementation ("androidx.security:security-crypto:1.1.0-alpha03")
+    implementation ("androidx.security:security-crypto:1.1.0-alpha03")
 }

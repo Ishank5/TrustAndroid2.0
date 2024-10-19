@@ -1,6 +1,5 @@
 package com.example.trustandroid20
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
@@ -11,7 +10,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import androidx.compose.ui.platform.LocalContext
+
 import androidx.core.app.NotificationCompat
 
 

@@ -53,24 +53,6 @@ fun HomeScreen(userName: String, onUserNameChange: (String) -> Unit, onScanButto
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
-//        OutlinedTextField(
-//            value = userName,
-//            onValueChange = onUserNameChange,
-//            label = { Text("Enter your name", color = Color(0xFFFDFEFE)) },
-//            colors = TextFieldDefaults.outlinedTextFieldColors(
-//                focusedBorderColor = Color(0xFFF39C12),
-//                unfocusedBorderColor = Color(0xFFFDFEFE),
-//                cursorColor = Color(0xFFFDFEFE),
-//
-//                focusedLabelColor = Color(0xFFF39C12),
-//                unfocusedLabelColor = Color(0xFFFDFEFE)
-//            ),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(horizontal = 24.dp)
-//                .padding(bottom = 16.dp)
-//        )
-
 
         Button(
             onClick = onScanButtonClick,
