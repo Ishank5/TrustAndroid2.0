@@ -64,9 +64,10 @@ import com.example.trustandroid20.ui.theme.TrustAndroid20Theme
 
 @Suppress("OVERRIDE_DEPRECATION")
 class MainActivity : ComponentActivity() {
-    private lateinit var sharedPreferences: SharedPreferences
+
 
     companion object {
+        lateinit var sharedPreferences: SharedPreferences
         const val REQUEST_CODE_ENABLE_ADMIN = 1
     }
 
