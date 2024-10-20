@@ -72,7 +72,7 @@ fun DeveloperDetailsScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Image(
-            painter = painterResource(id = R.mipmap.isgl_foreground),
+            painter = painterResource(id = R.mipmap.randam_foreground),
             contentDescription = "New Developer",
             modifier = Modifier
                 .size(150.dp)
