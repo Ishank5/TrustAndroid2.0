@@ -124,8 +124,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun proceedToApp() {
-        val username = sharedPreferences.getString("username", "")
-        Globalvariable.username = username ?: ""
+        val username = sharedPreferences.getString("username", "temp")
+        Globalvariable.username = username ?: "temp"
 
         setContent {
             TrustAndroid20Theme {
@@ -193,18 +193,25 @@ fun MainApp(sharedPreferences: SharedPreferences) {
             arguments = listOf(navArgument("email") { type = NavType.StringType })
         ) { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
-            HomeScreen(
-                userName = email,
-                onUserNameChange = { },
-                onScanButtonClick = {
-                    coroutineScope.launch {
-                        checkForBannedApps(context, Globalvariable.username) {
-                            bannedAppsList = it
-                            navController.navigate("showBannedAppsScreen")
+            var showBannedApps by remember { mutableStateOf(false) }
+            if (showBannedApps) {
+                BannedAppsList(bannedAppsList) { packageName ->
+                    deleteApp(context, packageName)
+                }
+            } else {
+                HomeScreen(
+                    userName = email,
+                    onUserNameChange = { /* No-op, as email should not change */ },
+                    onScanButtonClick = {
+                        coroutineScope.launch {
+                            checkForBannedApps(context, email) {
+                                bannedAppsList = it
+                                showBannedApps = true
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
         }
         composable("showAllScreen") {
             ShowAllBannedAppsScreen(allBannedApps)
@@ -284,7 +291,7 @@ fun LoginScreen(
         Button(
             onClick = {
                 if (isInternetAvailable(context)) {
-                    sharedPreferences.edit().putString("username", email).commit() // Immediate save
+                    sharedPreferences.edit().putString("username", email).apply() // Immediate save
                     Globalvariable.username = email
                     authViewModel.login(email, password)
                 } else {

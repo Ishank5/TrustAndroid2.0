@@ -12,6 +12,8 @@ import android.os.IBinder
 import android.os.Looper
 
 import androidx.core.app.NotificationCompat
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKeys
 
 
 class MyForegroundService : Service() {
@@ -19,6 +21,8 @@ class MyForegroundService : Service() {
     companion object {
         const val CHANNEL_ID = "ForegroundServiceChannel"
     }
+
+    private var userName: String = "temp"
 
     override fun onCreate() {
         super.onCreate()
@@ -29,6 +33,7 @@ class MyForegroundService : Service() {
             .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .build()
         startForeground(1, notification)
+
         checkForBannedAppsPeriodically()
     }
 
@@ -40,7 +45,7 @@ class MyForegroundService : Service() {
                 NotificationManager.IMPORTANCE_HIGH
             )
             val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(serviceChannel)
+            manager?.createNotificationChannel(serviceChannel)
         }
     }
 
@@ -48,22 +53,31 @@ class MyForegroundService : Service() {
         val handler = Handler(Looper.getMainLooper())
         val runnable = object : Runnable {
             override fun run() {
-                val sharedPreferences: SharedPreferences = getSharedPreferences(
-                    "user_prefs",
-                    Context.MODE_PRIVATE
-                )
-                var userName: String = sharedPreferences.getString("username", "temp") ?: "temp"
-                if (Globalvariable.username.isNotEmpty()) {
-                    userName = Globalvariable.username
-                }
+                fetchUsernameFromPreferences()
 
                 checkForBannedApps(applicationContext, userName) {
                     // Handle the result if needed
                 }
-                handler.postDelayed(this, 1 * 10 * 1000) // Run every 10 seconds
+                handler.postDelayed(this, 10 * 1000) // Run every 10 seconds
             }
         }
         handler.post(runnable)
+    }
+
+    private fun fetchUsernameFromPreferences() {
+        val sharedPreferences = getEncryptedSharedPreferences()
+        userName = sharedPreferences.getString("username", "temp") ?: "temp"
+    }
+
+    private fun getEncryptedSharedPreferences(): SharedPreferences {
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
+        return EncryptedSharedPreferences.create(
+            "user_prefs",
+            masterKeyAlias,
+            this,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
     }
 
     override fun onBind(intent: Intent?): IBinder? {
