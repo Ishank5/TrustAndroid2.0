@@ -61,13 +61,13 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.graphics.Brush
 import com.example.trustandroid20.ui.theme.TrustAndroid20Theme
 
+
 @Suppress("OVERRIDE_DEPRECATION")
 class MainActivity : ComponentActivity() {
     private lateinit var sharedPreferences: SharedPreferences
 
     companion object {
         const val REQUEST_CODE_ENABLE_ADMIN = 1
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,40 +91,15 @@ class MainActivity : ComponentActivity() {
             Log.e("FirebaseError", "Failed to initialize Firebase", e)
         }
 
-        // Check if the username is 'temp'
-        val username = sharedPreferences.getString("username", "")
-
-        Globalvariable.username = username ?: ""////////////////////////////////////////////
-
-        if (username == "temp") {
-            // Navigate to the login screen
-            setContent {
-                TrustAndroid20Theme {
-                    LoginScreen(authViewModel = AuthViewModel(), sharedPreferences = sharedPreferences) { email ->
-                        sharedPreferences.edit().putString("username", email).commit() // Use commit() for immediate save
-                    }
-                }
-            }
+        // Check if device admin is enabled
+        val devicePolicyManager = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        val componentName = ComponentName(this, MyDeviceAdminReceiver::class.java)
+        if (!devicePolicyManager.isAdminActive(componentName)) {
+            requestDeviceAdmin()
         } else {
-            // Check if user is already logged in
-            if (sharedPreferences.getBoolean("is_logged_in", false)) {
-                // Navigate to the main screen directly
-                setContent {
-                    TrustAndroid20Theme {
-                        TrustAndroid()
-                    }
-                }
-            } else {
-                requestDeviceAdmin()
-                setContent {
-                    TrustAndroid20Theme {
-                        TrustAndroid()
-                    }
-                }
-            }
+            proceedToApp()
         }
     }
-
 
     private fun requestDeviceAdmin() {
         val deviceAdminComponent = ComponentName(this, MyDeviceAdminReceiver::class.java)
@@ -140,32 +115,43 @@ class MainActivity : ComponentActivity() {
         if (requestCode == REQUEST_CODE_ENABLE_ADMIN) {
             if (resultCode == Activity.RESULT_OK) {
                 Toast.makeText(this, "Device Admin Enabled", Toast.LENGTH_SHORT).show()
-                // Start the foreground service
-                val serviceIntent = Intent(this, MyForegroundService::class.java)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    startForegroundService(serviceIntent)
-                } else {
-                    startService(serviceIntent)
-                }
+                proceedToApp()
             } else {
                 Toast.makeText(this, "Device Admin Enabling Failed", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
+    private fun proceedToApp() {
+        val username = sharedPreferences.getString("username", "")
+        Globalvariable.username = username ?: ""
+
+        setContent {
+            TrustAndroid20Theme {
+                MainApp(sharedPreferences)
+            }
+        }
+    }
 }
+
 @Composable
-fun TrustAndroid() {
+fun MainApp(sharedPreferences: SharedPreferences) {
     val navController = rememberNavController()
-    val bannedAppsList by remember { mutableStateOf<List<PackageInfo>>(emptyList()) }
+    var bannedAppsList by remember { mutableStateOf<List<PackageInfo>>(emptyList()) }
     var allBannedApps by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
     val context = LocalContext.current
-    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-    val isLoggedIn = sharedPreferences.getBoolean("is_logged_in", false)
-    val startDestination = if (isLoggedIn) "firstScreen/${sharedPreferences.getString("email", "")}" else "loginScreen"
+    val coroutineScope = rememberCoroutineScope()
 
+    val startDestination = if (sharedPreferences.getBoolean("is_logged_in", false)) {
+        "firstScreen/${sharedPreferences.getString("email", "")}"
+
+    } else {
+        "loginScreen"
+    }
     NavHost(navController = navController, startDestination = startDestination) {
         composable("loginScreen") {
             LoginScreen(authViewModel = AuthViewModel(), sharedPreferences = sharedPreferences) { email ->
+                sharedPreferences.edit().putString("username", email).commit()
                 navController.navigate("firstScreen/$email") {
                     popUpTo("loginScreen") { inclusive = true }
                 }
@@ -176,19 +162,26 @@ fun TrustAndroid() {
             arguments = listOf(navArgument("email") { type = NavType.StringType })
         ) { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
+            // Start the foreground service when reaching the first screen
+            val serviceIntent = Intent(context, MyForegroundService::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent)
+            } else {
+                context.startService(serviceIntent)
+            }
             HomeScreenUI({ feature ->
                 when (feature) {
                     "Scanning" -> navController.navigate("secondScreen/$email")
                     "Feature3" -> navController.navigate("feature3Screen")
                     "Feature 4" -> {
                         fetchAllBannedAppsFromFirestore {
-                            allBannedApps = it
                             navController.navigate("showAllScreen")
+                            allBannedApps = it
                         }
                     }
                     "ContactDevelopers" -> navController.navigate("contactDevelopersScreen")
                 }
-            }, bannedAppsList, onContactClick = {
+            }, bannedApps = bannedAppsList, onContactClick = {
                 navController.navigate("contactDevelopersScreen")
             }, onHowToUseClick = {
                 navController.navigate("howToUseScreen")
@@ -199,28 +192,18 @@ fun TrustAndroid() {
             arguments = listOf(navArgument("email") { type = NavType.StringType })
         ) { backStackEntry ->
             val email = backStackEntry.arguments?.getString("email") ?: ""
-            var showBannedApps by remember { mutableStateOf(false) }
-            var bannedAppsList by remember { mutableStateOf<List<PackageInfo>>(emptyList()) }
-            val coroutineScope = rememberCoroutineScope()
-
-            if (showBannedApps) {
-                BannedAppsList(bannedAppsList) { packageName ->
-                    deleteApp(context, packageName)
-                }
-            } else {
-                HomeScreen(
-                    userName = email,
-                    onUserNameChange = { /* No-op, as email should not change */ },
-                    onScanButtonClick = {
-                        coroutineScope.launch {
-                            checkForBannedApps(context, email) {
-                                bannedAppsList = it
-                                showBannedApps = true
-                            }
+            HomeScreen(
+                userName = email,
+                onUserNameChange = { },
+                onScanButtonClick = {
+                    coroutineScope.launch {
+                        checkForBannedApps(context, Globalvariable.username) {
+                            bannedAppsList = it
+                            navController.navigate("showBannedAppsScreen")
                         }
                     }
-                )
-            }
+                }
+            )
         }
         composable("showAllScreen") {
             ShowAllBannedAppsScreen(allBannedApps)
@@ -233,6 +216,7 @@ fun TrustAndroid() {
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

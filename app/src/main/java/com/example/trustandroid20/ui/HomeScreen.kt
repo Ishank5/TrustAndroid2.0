@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(userName: String, onUserNameChange: (String) -> Unit, onScanButtonClick: () -> Unit) {
+fun HomeScreen(userName: String, onUserNameChange: (String) -> Unit, onScanButtonClick:  () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
