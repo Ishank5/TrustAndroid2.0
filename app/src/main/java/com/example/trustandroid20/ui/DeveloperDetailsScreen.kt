@@ -79,7 +79,7 @@ fun DeveloperDetailsScreen() {
                 .padding(8.dp)
         )
         Text(
-            text = "Developer 3: Ratn Govindam\nEmail: r_govindam_be22@thapar.edu\nContact: 9779791959",
+            text = "Developer 3: Ratn Govindam\nEmail: rgovindam_be22@thapar.edu\nContact: 9779791959",
             style = MaterialTheme.typography.bodyLarge.copy(
                 color = Color(0xFFD1E8E2), // Light Grey
                 fontSize = 18.sp
