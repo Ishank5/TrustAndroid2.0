@@ -53,8 +53,9 @@ fun HomeScreenUI(onFeatureClick: (String) -> Unit, bannedApps: List<PackageInfo>
             )
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(64.dp))
+
 
         Text(
             text = "Welcome to TrustAndroid",

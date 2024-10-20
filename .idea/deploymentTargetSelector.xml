@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="Trust Android">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-10-20T09:35:24.831005Z">
+        <DropdownSelection timestamp="2024-10-20T10:45:25.828326Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=ea77aceb" />
@@ -15,12 +15,12 @@
           <targets>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="PhysicalDevice" identifier="serial=ea77aceb" />
+                <DeviceId pluginId="PhysicalDevice" identifier="serial=GUJR49QKRKMVLFSC" />
               </handle>
             </Target>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="LocalEmulator" identifier="path=/Users/ansh/.android/avd/Pixel_9_Pro_XL_API_35.avd" />
+                <DeviceId pluginId="PhysicalDevice" identifier="serial=ea77aceb" />
               </handle>
             </Target>
           </targets>
